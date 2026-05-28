@@ -10,29 +10,13 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
-        .login-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .login-card { background: white; border-radius: 24px; padding: 40px; width: 100%; max-width: 450px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-        .logo { text-align: center; margin-bottom: 30px; }
-        .logo i { font-size: 60px; color: #667eea; }
-        .logo h1 { font-size: 28px; margin-top: 10px; color: #333; }
-        .logo p { color: #666; font-size: 14px; }
-        .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #333; }
-        .input-group input { width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 14px; }
-        .input-group input:focus { outline: none; border-color: #667eea; }
-        .login-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; }
-        .login-btn:hover { transform: translateY(-2px); }
-        .error-msg { background: #fee; color: #c00; padding: 12px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; display: none; }
-        .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 0.8s linear infinite; margin-right: 8px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .dashboard-container { display: none; min-height: 100vh; }
+        .dashboard-container { min-height: 100vh; }
         .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100%; background: white; box-shadow: 2px 0 10px rgba(0,0,0,0.1); z-index: 100; overflow-y: auto; }
         .sidebar-header { padding: 25px; border-bottom: 1px solid #eee; }
         .sidebar-header h2 { font-size: 20px; color: #333; }
         .nav-item { padding: 15px 25px; display: flex; align-items: center; gap: 12px; color: #555; cursor: pointer; transition: all 0.3s; }
         .nav-item:hover, .nav-item.active { background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); color: #667eea; border-left: 3px solid #667eea; }
         .user-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 25px; border-top: 1px solid #eee; background: white; }
-        .logout-btn { background: #fee; color: #e74c3c; border: none; padding: 10px; border-radius: 10px; cursor: pointer; width: 100%; font-weight: 600; }
         .main-content { margin-left: 280px; padding: 20px; }
         .top-bar { background: white; padding: 15px 25px; border-radius: 16px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
         .page-title { font-size: 24px; font-weight: 700; color: #333; }
@@ -59,6 +43,7 @@
         .form-group input, .form-group select, .form-group textarea { padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
         .form-section { background: #f8f9fa; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
         .form-section h3 { margin-bottom: 15px; color: #333; border-left: 4px solid #667eea; padding-left: 10px; }
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 15px; }
         .btn-submit { background: #28a745; color: white; padding: 12px 30px; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: 600; }
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
         .modal-content { background: white; margin: 5% auto; padding: 25px; border-radius: 16px; width: 90%; max-width: 550px; }
@@ -68,43 +53,12 @@
         .alert { padding: 12px; border-radius: 10px; margin-bottom: 20px; }
         .alert-success { background: #d4edda; color: #155724; }
         .alert-error { background: #f8d7da; color: #721c24; }
-        @media (max-width: 768px) { .sidebar { left: -280px; } .main-content { margin-left: 0; } }
+        .loading { text-align: center; padding: 20px; color: #667eea; }
+        @media (max-width: 768px) { .sidebar { left: -280px; transition: 0.3s; } .main-content { margin-left: 0; } }
     </style>
 </head>
 <body>
-    <!-- Login Page -->
-    <div id="loginPage" class="login-container">
-        <div class="login-card">
-            <div class="logo">
-                <i class="fas fa-graduation-cap"></i>
-                <h1>Guidance Office</h1>
-                <p>City College of Davao</p>
-            </div>
-            <form id="loginForm">
-                <div id="loginError" class="error-msg"></div>
-                <div class="input-group">
-                    <label><i class="fas fa-envelope"></i> Email</label>
-                    <input type="email" id="loginEmail" placeholder="Enter your email" required>
-                </div>
-                <div class="input-group">
-                    <label><i class="fas fa-lock"></i> Password</label>
-                    <input type="password" id="loginPassword" placeholder="Enter your password" required>
-                </div>
-                <button type="submit" class="login-btn" id="loginButton">
-                    <i class="fas fa-sign-in-alt"></i> Login to Dashboard
-                </button>
-            </form>
-            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee; text-align: center;">
-                <p style="font-size: 12px; color: #666;">
-                    <strong>Demo Credentials:</strong><br>
-                    Admin: admin@guidance.com / admin123<br>
-                    Counselor: counselor@guidance.com / counselor123
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Dashboard -->
+    <!-- Dashboard - Direct Access (No Login) -->
     <div id="dashboard" class="dashboard-container">
         <div class="sidebar">
             <div class="sidebar-header">
@@ -118,9 +72,8 @@
                 <div class="nav-item" onclick="showPanel('visits')"><i class="fas fa-calendar-check"></i> Visit Logs</div>
             </div>
             <div class="user-info">
-                <div id="currentUserName" style="font-weight: 600; margin-bottom: 5px;">User Name</div>
-                <div id="currentUserRole" style="font-size: 12px; color: #666; margin-bottom: 10px;">Role</div>
-                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                <div id="currentUserName" style="font-weight: 600; margin-bottom: 5px;">Guidance Counselor</div>
+                <div id="currentUserRole" style="font-size: 12px; color: #666; margin-bottom: 10px;">STAFF</div>
             </div>
         </div>
 
@@ -130,6 +83,7 @@
             </div>
             <div id="alertContainer"></div>
 
+            <!-- Dashboard Panel -->
             <div id="panel-dashboard" class="panel active">
                 <div class="stats-grid">
                     <div class="stat-card"><div class="stat-info"><h3 id="totalStudents">0</h3><p>Total Students</p></div><div class="stat-icon"><i class="fas fa-user-graduate"></i></div></div>
@@ -142,6 +96,7 @@
                 </div>
             </div>
 
+            <!-- Student List Panel -->
             <div id="panel-students" class="panel">
                 <div class="search-bar">
                     <input type="text" id="searchInput" placeholder="Search by name...">
@@ -157,6 +112,7 @@
                 </div>
             </div>
 
+            <!-- Add Student Panel -->
             <div id="panel-addStudent" class="panel">
                 <form id="addStudentForm">
                     <div class="form-section">
@@ -206,10 +162,20 @@
                             <div class="form-group"><label>Characteristics</label><input type="text" name="characteristics"></div>
                         </div>
                     </div>
+                    <div class="form-section">
+                        <h3>📚 Subjects Needing Help</h3>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" name="subjects" value="English"> English</label>
+                            <label><input type="checkbox" name="subjects" value="Math"> Math</label>
+                            <label><input type="checkbox" name="subjects" value="Science"> Science</label>
+                            <label><input type="checkbox" name="subjects" value="Filipino"> Filipino</label>
+                        </div>
+                    </div>
                     <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Save Student Record</button>
                 </form>
             </div>
 
+            <!-- Visit Logs Panel -->
             <div id="panel-visits" class="panel">
                 <div class="search-bar">
                     <input type="text" id="visitSearchInput" placeholder="Search by student name...">
@@ -227,6 +193,7 @@
         </div>
     </div>
 
+    <!-- Visit Log Modal -->
     <div id="visitModal" class="modal">
         <div class="modal-content">
             <div class="modal-header"><h3><i class="fas fa-calendar-check"></i> Log Student Visit</h3><span class="modal-close" onclick="closeVisitModal()">&times;</span></div>
@@ -252,90 +219,14 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZWdqc29sbnd4Z3pkdnRlZWRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NDUzMzUsImV4cCI6MjA5NTUyMTMzNX0.oJhiyGHOpMArmTequaTBAKYokpN23aQOr9B4ydGPIeY';
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        let currentUser = null;
-
-        // LOGIN FUNCTION - FIXED!
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            const errorDiv = document.getElementById('loginError');
-            const loginBtn = document.getElementById('loginButton');
-            
-            // Show loading state
-            errorDiv.style.display = 'none';
-            loginBtn.innerHTML = '<span class="loading-spinner"></span> Logging in...';
-            loginBtn.disabled = true;
-            
-            try {
-                // Check if users table exists first
-                const { error: tableCheck } = await supabase.from('users').select('count', { count: 'exact', head: true });
-                
-                if (tableCheck) {
-                    errorDiv.innerHTML = '❌ Database not setup. Please run the SQL code in Supabase SQL Editor first.';
-                    errorDiv.style.display = 'block';
-                    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login to Dashboard';
-                    loginBtn.disabled = false;
-                    return;
-                }
-                
-                // Try to find the user
-                const { data: users, error } = await supabase
-                    .from('users')
-                    .select('*')
-                    .eq('email', email)
-                    .eq('password', password);
-                
-                if (error) {
-                    errorDiv.innerHTML = 'Database error: ' + error.message;
-                    errorDiv.style.display = 'block';
-                    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login to Dashboard';
-                    loginBtn.disabled = false;
-                    return;
-                }
-                
-                if (users && users.length > 0) {
-                    currentUser = users[0];
-                    
-                    // HIDE LOGIN PAGE
-                    document.getElementById('loginPage').style.display = 'none';
-                    
-                    // SHOW DASHBOARD
-                    document.getElementById('dashboard').style.display = 'block';
-                    
-                    // Update user info
-                    document.getElementById('currentUserName').innerText = currentUser.first_name + ' ' + currentUser.last_name;
-                    document.getElementById('currentUserRole').innerText = currentUser.role.toUpperCase();
-                    
-                    // Load all data
-                    await loadDashboard();
-                    await loadStudents();
-                    await loadVisits();
-                    
-                    showAlert('Welcome back, ' + currentUser.first_name + '!', 'success');
-                } else {
-                    errorDiv.innerHTML = '❌ Invalid email or password. Try: admin@guidance.com / admin123';
-                    errorDiv.style.display = 'block';
-                }
-                
-            } catch(err) {
-                errorDiv.innerHTML = 'Error: ' + err.message;
-                errorDiv.style.display = 'block';
-            } finally {
-                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login to Dashboard';
-                loginBtn.disabled = false;
-            }
-        });
         
-        function logout() {
-            currentUser = null;
-            document.getElementById('dashboard').style.display = 'none';
-            document.getElementById('loginPage').style.display = 'flex';
-            document.getElementById('loginEmail').value = '';
-            document.getElementById('loginPassword').value = '';
-            document.getElementById('alertContainer').innerHTML = '';
-        }
+        // Load all data on page load
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadDashboard();
+            await loadStudents();
+            await loadVisits();
+            showAlert('System ready! Data loaded from Supabase.', 'success');
+        });
         
         async function loadDashboard() {
             try {
@@ -411,6 +302,8 @@
         document.getElementById('addStudentForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const formData = new FormData(e.target);
+            const subjects = Array.from(formData.getAll('subjects')).join(',');
+            
             const newStudent = {
                 family_name: formData.get('family_name'),
                 first_name: formData.get('first_name'),
@@ -434,7 +327,8 @@
                 hobbies: formData.get('hobbies'),
                 ambitions: formData.get('ambitions'),
                 motto: formData.get('motto'),
-                characteristics: formData.get('characteristics')
+                characteristics: formData.get('characteristics'),
+                subjects: subjects
             };
             
             const { error } = await supabase.from('students').insert([newStudent]);
@@ -465,7 +359,7 @@
                     row.insertCell(2).innerHTML = visit.reason?.substring(0, 50) || '-';
                     row.insertCell(3).innerHTML = visit.action?.substring(0, 50) || '-';
                     row.insertCell(4).innerHTML = visit.recorded_by || 'System';
-                    row.insertCell(5).innerHTML = visit.follow_up_needed ? '⚠️ Follow-up' : 'Completed';
+                    row.insertCell(5).innerHTML = visit.follow_up_needed ? '<span style="color:#ffc107;">⚠️ Follow-up</span>' : '<span style="color:#28a745;">Completed</span>';
                 });
             } catch(e) {
                 document.getElementById('visitsLoading').style.display = 'none';
@@ -524,7 +418,7 @@
             
             const { error } = await supabase.from('visits').insert([{
                 student_id: studentId, datetime, reason, concerns, action, follow_up_needed: followUpNeeded,
-                recorded_by: currentUser?.first_name + ' ' + currentUser?.last_name || 'System'
+                recorded_by: 'Guidance Counselor'
             }]);
             
             if (error) { alert('Error: ' + error.message); } 
