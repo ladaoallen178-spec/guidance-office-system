@@ -3,71 +3,482 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guidance Office System | City College of Davao</title>
+    <title>Guidance Office System | Supabase Database</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
-        .login-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .login-card { background: white; border-radius: 24px; padding: 40px; width: 100%; max-width: 450px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-        .logo { text-align: center; margin-bottom: 30px; }
-        .logo i { font-size: 60px; color: #667eea; }
-        .logo h1 { font-size: 28px; margin-top: 10px; color: #333; }
-        .logo p { color: #666; font-size: 14px; }
-        .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #333; }
-        .input-group input { width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 14px; }
-        .input-group input:focus { outline: none; border-color: #667eea; }
-        .login-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; }
-        .login-btn:hover { transform: translateY(-2px); }
-        .error-msg { background: #fee; color: #c00; padding: 12px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; display: none; }
-        .dashboard-container { display: none; min-height: 100vh; }
-        .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100%; background: white; box-shadow: 2px 0 10px rgba(0,0,0,0.1); z-index: 100; overflow-y: auto; }
-        .sidebar-header { padding: 25px; border-bottom: 1px solid #eee; }
-        .sidebar-header h2 { font-size: 20px; color: #333; }
-        .nav-item { padding: 15px 25px; display: flex; align-items: center; gap: 12px; color: #555; cursor: pointer; transition: all 0.3s; }
-        .nav-item:hover, .nav-item.active { background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); color: #667eea; border-left: 3px solid #667eea; }
-        .user-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 25px; border-top: 1px solid #eee; background: white; }
-        .logout-btn { background: #fee; color: #e74c3c; border: none; padding: 10px; border-radius: 10px; cursor: pointer; width: 100%; font-weight: 600; }
-        .main-content { margin-left: 280px; padding: 20px; }
-        .top-bar { background: white; padding: 15px 25px; border-radius: 16px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
-        .page-title { font-size: 24px; font-weight: 700; color: #333; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 25px; }
-        .stat-card { background: white; padding: 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; }
-        .stat-info h3 { font-size: 28px; color: #333; }
-        .stat-icon { width: 50px; height: 50px; background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #667eea; }
-        .panel { display: none; background: white; border-radius: 16px; padding: 25px; }
-        .panel.active { display: block; }
-        .search-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .search-bar input { flex: 1; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 12px; min-width: 200px; }
-        .search-bar button { padding: 12px 25px; background: #667eea; color: white; border: none; border-radius: 12px; cursor: pointer; }
-        .data-table { width: 100%; border-collapse: collapse; }
-        .data-table th, .data-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-        .data-table th { background: #f8f9fa; font-weight: 600; }
-        .btn-view, .btn-delete, .btn-visit, .btn-print { padding: 6px 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 12px; margin-right: 5px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* Login Container */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo i {
+            font-size: 60px;
+            color: #667eea;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            margin-top: 10px;
+            color: #333;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .error-msg {
+            background: #fee;
+            color: #c00;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        /* Dashboard Styles */
+        .dashboard-container {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100%;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 25px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .sidebar-header h2 {
+            font-size: 20px;
+            color: #333;
+        }
+
+        .sidebar-header p {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .nav-item {
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            color: #667eea;
+            border-left: 3px solid #667eea;
+        }
+
+        .user-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 25px;
+            border-top: 1px solid #eee;
+        }
+
+        .logout-btn {
+            background: #fee;
+            color: #e74c3c;
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 20px;
+        }
+
+        .top-bar {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .stat-info h3 {
+            font-size: 28px;
+            color: #333;
+        }
+
+        .stat-info p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #667eea;
+        }
+
+        .panel {
+            display: none;
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .panel.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 14px;
+        }
+
+        .search-bar button {
+            padding: 12px 25px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .btn-view, .btn-delete, .btn-visit, .btn-print {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+
         .btn-view { background: #28a745; color: white; }
         .btn-delete { background: #dc3545; color: white; }
         .btn-visit { background: #ffc107; color: #333; }
         .btn-print { background: #17a2b8; color: white; }
-        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 15px; }
-        .form-group { display: flex; flex-direction: column; }
-        .form-group label { font-weight: 600; margin-bottom: 5px; font-size: 13px; }
-        .form-group input, .form-group select, .form-group textarea { padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
-        .form-section { background: #f8f9fa; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
-        .form-section h3 { margin-bottom: 15px; color: #333; border-left: 4px solid #667eea; padding-left: 10px; }
-        .btn-submit { background: #28a745; color: white; padding: 12px 30px; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: 600; }
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
-        .modal-content { background: white; margin: 5% auto; padding: 25px; border-radius: 16px; width: 90%; max-width: 550px; }
-        .modal-header { display: flex; justify-content: space-between; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #eee; }
-        .modal-close { font-size: 28px; cursor: pointer; }
-        .alert { padding: 12px; border-radius: 10px; margin-bottom: 20px; }
-        .alert-success { background: #d4edda; color: #155724; }
-        .alert-error { background: #f8d7da; color: #721c24; }
-        .loading { text-align: center; padding: 20px; color: #667eea; }
-        .info-card { background: #f8f9fa; padding: 20px; border-radius: 12px; }
-        @media (max-width: 768px) { .sidebar { left: -280px; transition: 0.3s; } .main-content { margin-left: 0; } }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .form-section h3 {
+            margin-bottom: 15px;
+            color: #333;
+            border-left: 4px solid #667eea;
+            padding-left: 10px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .btn-submit {
+            background: #28a745;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 25px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 550px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .modal-close {
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .student-profile {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .info-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .info-card h4 {
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .info-card p {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -280px;
+                transition: 0.3s;
+            }
+            .sidebar.open {
+                left: 0;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -80,7 +491,7 @@
                 <p>City College of Davao</p>
             </div>
             <form id="loginForm">
-                <div id="loginError" class="error-msg"></div>
+                <div id="loginError" class="error-msg" style="display: none;"></div>
                 <div class="input-group">
                     <label><i class="fas fa-envelope"></i> Email</label>
                     <input type="email" id="loginEmail" placeholder="Enter your email" required>
@@ -91,8 +502,8 @@
                 </div>
                 <button type="submit" class="login-btn">Login to Dashboard</button>
             </form>
-            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee; text-align: center;">
-                <p style="font-size: 12px; color: #666;">
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
+                <p style="font-size: 12px; color: #666; text-align: center;">
                     <strong>Demo Credentials:</strong><br>
                     Admin: admin@guidance.com / admin123<br>
                     Counselor: counselor@guidance.com / counselor123
@@ -103,16 +514,27 @@
 
     <!-- Dashboard -->
     <div id="dashboard" class="dashboard-container">
-        <div class="sidebar">
+        <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <h2><i class="fas fa-clinic-medical"></i> Guidance Office</h2>
                 <p>City College of Davao</p>
             </div>
             <div class="nav-menu">
-                <div class="nav-item active" onclick="showPanel('dashboard')"><i class="fas fa-chart-line"></i> Dashboard</div>
-                <div class="nav-item" onclick="showPanel('students')"><i class="fas fa-users"></i> Student List</div>
-                <div class="nav-item" onclick="showPanel('addStudent')"><i class="fas fa-user-plus"></i> Add Student</div>
-                <div class="nav-item" onclick="showPanel('visits')"><i class="fas fa-calendar-check"></i> Visit Logs</div>
+                <div class="nav-item active" onclick="showPanel('dashboard')">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </div>
+                <div class="nav-item" onclick="showPanel('students')">
+                    <i class="fas fa-users"></i> Student List
+                </div>
+                <div class="nav-item" onclick="showPanel('addStudent')">
+                    <i class="fas fa-user-plus"></i> Add Student
+                </div>
+                <div class="nav-item" onclick="showPanel('visits')">
+                    <i class="fas fa-calendar-check"></i> Visit Logs
+                </div>
+                <div class="nav-item" id="usersNav" style="display: none;" onclick="showPanel('users')">
+                    <i class="fas fa-user-cog"></i> Manage Users
+                </div>
             </div>
             <div class="user-info">
                 <div id="currentUserName" style="font-weight: 600; margin-bottom: 5px;">User Name</div>
@@ -124,15 +546,38 @@
         <div class="main-content">
             <div class="top-bar">
                 <div class="page-title" id="pageTitle">Dashboard</div>
+                <div class="user-badge">
+                    <i class="fas fa-bell"></i>
+                    <i class="fas fa-user-circle" style="font-size: 24px;"></i>
+                </div>
             </div>
+
             <div id="alertContainer"></div>
 
             <!-- Dashboard Panel -->
             <div id="panel-dashboard" class="panel active">
                 <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-info"><h3 id="totalStudents">0</h3><p>Total Students</p></div><div class="stat-icon"><i class="fas fa-user-graduate"></i></div></div>
-                    <div class="stat-card"><div class="stat-info"><h3 id="totalVisits">0</h3><p>Total Visits</p></div><div class="stat-icon"><i class="fas fa-calendar-alt"></i></div></div>
-                    <div class="stat-card"><div class="stat-info"><h3 id="pendingFollowups">0</h3><p>Pending Follow-ups</p></div><div class="stat-icon"><i class="fas fa-clock"></i></div></div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3 id="totalStudents">0</h3>
+                            <p>Total Students</p>
+                        </div>
+                        <div class="stat-icon"><i class="fas fa-user-graduate"></i></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3 id="totalVisits">0</h3>
+                            <p>Total Visits</p>
+                        </div>
+                        <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3 id="pendingFollowups">0</h3>
+                            <p>Pending Follow-ups</p>
+                        </div>
+                        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                    </div>
                 </div>
                 <div class="info-card">
                     <h4>Welcome to Guidance Office Management System</h4>
@@ -150,10 +595,13 @@
                 <div id="studentsLoading" class="loading" style="display: none;">Loading students...</div>
                 <div style="overflow-x: auto;">
                     <table class="data-table">
-                        <thead><tr><th>ID</th><th>Family Name</th><th>First Name</th><th>Nickname</th><th>Age</th><th>Actions</th></tr></thead>
+                        <thead>
+                            <tr><th>ID</th><th>Family Name</th><th>First Name</th><th>Nickname</th><th>Age</th><th>Actions</th></tr>
+                        </thead>
                         <tbody id="studentsTableBody"></tbody>
                     </table>
                 </div>
+                <div id="studentProfile" class="student-profile" style="display: none;"></div>
             </div>
 
             <!-- Add Student Panel -->
@@ -170,15 +618,17 @@
                         <div class="form-row">
                             <div class="form-group"><label>Age</label><input type="number" name="age"></div>
                             <div class="form-group"><label>Birth Date</label><input type="date" name="birth_date"></div>
+                            <div class="form-group"><label>Birth Place</label><input type="text" name="birth_place"></div>
                             <div class="form-group"><label>Gender</label><select name="gender"><option>Male</option><option>Female</option></select></div>
-                            <div class="form-group"><label>Current Address</label><input type="text" name="current_address"></div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group"><label>Emergency Contact</label><input type="text" name="emergency_contact"></div>
                             <div class="form-group"><label>Spoken Language</label><input type="text" name="spoken_language"></div>
                             <div class="form-group"><label>Religion</label><input type="text" name="religion"></div>
+                            <div class="form-group"><label>Current Address</label><input type="text" name="current_address"></div>
+                            <div class="form-group"><label>Emergency Contact</label><input type="text" name="emergency_contact"></div>
                         </div>
                     </div>
+
                     <div class="form-section">
                         <h3>👨‍👩‍👧 Family Background</h3>
                         <div class="form-row">
@@ -188,6 +638,7 @@
                             <div class="form-group"><label>Mother's Occupation</label><input type="text" name="mother_occupation"></div>
                         </div>
                     </div>
+
                     <div class="form-section">
                         <h3>🎓 Educational Background</h3>
                         <div class="form-row">
@@ -197,6 +648,7 @@
                             <div class="form-group"><label>Year Graduated</label><input type="number" name="shs_year"></div>
                         </div>
                     </div>
+
                     <div class="form-section">
                         <h3>🌟 Unique Features</h3>
                         <div class="form-row">
@@ -206,6 +658,17 @@
                             <div class="form-group"><label>Characteristics</label><input type="text" name="characteristics"></div>
                         </div>
                     </div>
+
+                    <div class="form-section">
+                        <h3>📚 Subjects Needing Help</h3>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" name="subjects" value="English"> English</label>
+                            <label><input type="checkbox" name="subjects" value="Math"> Math</label>
+                            <label><input type="checkbox" name="subjects" value="Science"> Science</label>
+                            <label><input type="checkbox" name="subjects" value="Filipino"> Filipino</label>
+                        </div>
+                    </div>
+
                     <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Save Student Record</button>
                 </form>
             </div>
@@ -220,9 +683,47 @@
                 <div id="visitsLoading" class="loading" style="display: none;">Loading visits...</div>
                 <div style="overflow-x: auto;">
                     <table class="data-table">
-                        <thead><tr><th>Date & Time</th><th>Student</th><th>Reason</th><th>Action Taken</th><th>Recorded By</th><th>Status</th></tr></thead>
+                        <thead>
+                            <tr><th>Date & Time</th><th>Student</th><th>Reason</th><th>Action Taken</th><th>Recorded By</th><th>Status</th></tr>
+                        </thead>
                         <tbody id="visitsTableBody"></tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- Manage Users Panel -->
+            <div id="panel-users" class="panel">
+                <div class="form-section">
+                    <h3>👤 Add New User</h3>
+                    <form id="addUserForm">
+                        <div class="form-row">
+                            <div class="form-group"><label>First Name</label><input type="text" name="first_name" required></div>
+                            <div class="form-group"><label>Last Name</label><input type="text" name="last_name" required></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Email</label><input type="email" name="email" required></div>
+                            <div class="form-group"><label>Password</label><input type="password" name="password" required></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Role</label>
+                                <select name="role">
+                                    <option>counselor</option>
+                                    <option>staff</option>
+                                    <option>admin</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-submit">Add User</button>
+                    </form>
+                </div>
+                <div class="form-section">
+                    <h3>📋 System Users</h3>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead>
+                            <tbody id="usersTableBody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -231,15 +732,34 @@
     <!-- Visit Log Modal -->
     <div id="visitModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header"><h3><i class="fas fa-calendar-check"></i> Log Student Visit</h3><span class="modal-close" onclick="closeVisitModal()">&times;</span></div>
+            <div class="modal-header">
+                <h3><i class="fas fa-calendar-check"></i> Log Student Visit</h3>
+                <span class="modal-close" onclick="closeVisitModal()">&times;</span>
+            </div>
             <div class="modal-body">
                 <input type="hidden" id="visitStudentId">
-                <div class="form-group"><label>Student: <strong id="visitStudentName"></strong></label></div>
-                <div class="form-group"><label>📅 Date & Time *</label><input type="datetime-local" id="visitDateTime" required></div>
-                <div class="form-group"><label>📝 Reason for Visit *</label><textarea id="visitReason" rows="3" placeholder="e.g., Academic concerns, Personal issues..." required></textarea></div>
-                <div class="form-group"><label>💬 Concerns Discussed</label><textarea id="visitConcerns" rows="2" placeholder="What did the student share?"></textarea></div>
-                <div class="form-group"><label>🛠️ Action Taken</label><textarea id="visitAction" rows="2" placeholder="What advice or action was given?"></textarea></div>
-                <div class="form-group"><label><input type="checkbox" id="followUpNeeded"> ⚠️ Follow-up needed</label></div>
+                <div class="form-group">
+                    <label>Student: <strong id="visitStudentName"></strong></label>
+                </div>
+                <div class="form-group">
+                    <label>📅 Date & Time *</label>
+                    <input type="datetime-local" id="visitDateTime" required>
+                </div>
+                <div class="form-group">
+                    <label>📝 Reason for Visit *</label>
+                    <textarea id="visitReason" rows="3" placeholder="e.g., Academic concerns, Personal issues..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>💬 Concerns Discussed</label>
+                    <textarea id="visitConcerns" rows="2" placeholder="What did the student share?"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>🛠️ Action Taken</label>
+                    <textarea id="visitAction" rows="2" placeholder="What advice or action was given?"></textarea>
+                </div>
+                <div class="form-group">
+                    <label><input type="checkbox" id="followUpNeeded"> ⚠️ Follow-up needed</label>
+                </div>
             </div>
             <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
                 <button onclick="closeVisitModal()" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 8px;">Cancel</button>
@@ -250,163 +770,226 @@
 
     <script>
         // =====================================================
-        // !!! IMPORTANT: REPLACE WITH YOUR SUPABASE KEYS !!!
-        // Get from: Supabase Dashboard → Settings → API
+        // SUPABASE CONFIGURATION
+        // REPLACE WITH YOUR ACTUAL SUPABASE CREDENTIALS!
         // =====================================================
-        const MY_SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';  // ← REPLACE THIS
-        const MY_SUPABASE_KEY = 'YOUR_ANON_KEY';  // ← REPLACE THIS
+        const SUPABASE_URL = 'https://gsegjsolnwxgzdvteedc.supabase.co';  // Replace with your Project URL
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZWdqc29sbnd4Z3pkdnRlZWRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NDUzMzUsImV4cCI6MjA5NTUyMTMzNX0.oJhiyGHOpMArmTequaTBAKYokpN23aQOr9B4ydGPIeY';  // Replace with your anon public key
         
-        // Initialize Supabase client (only once)
-        const _supabase = window.supabase.createClient(MY_SUPABASE_URL, MY_SUPABASE_KEY);
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         let currentUser = null;
         
-        // Login handler
+        // =====================================================
+        // LOGIN FUNCTION
+        // =====================================================
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-            const errorDiv = document.getElementById('loginError');
             
-            errorDiv.style.display = 'none';
+            const { data: users, error } = await supabase
+                .from('users')
+                .select('*')
+                .eq('email', email)
+                .eq('password', password);
             
-            try {
-                const { data: users, error } = await _supabase
-                    .from('users')
-                    .select('*')
-                    .eq('email', email)
-                    .eq('password', password);
+            if (error) {
+                showLoginError('System error: ' + error.message);
+                return;
+            }
+            
+            if (users && users.length > 0) {
+                currentUser = users[0];
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                document.getElementById('currentUserName').innerText = currentUser.first_name + ' ' + currentUser.last_name;
+                document.getElementById('currentUserRole').innerText = currentUser.role.toUpperCase();
                 
-                if (error) {
-                    errorDiv.innerHTML = 'Database error: ' + error.message;
-                    errorDiv.style.display = 'block';
-                    return;
-                }
-                
-                if (users && users.length > 0) {
-                    currentUser = users[0];
-                    document.getElementById('loginPage').style.display = 'none';
-                    document.getElementById('dashboard').style.display = 'block';
-                    document.getElementById('currentUserName').innerText = currentUser.first_name + ' ' + currentUser.last_name;
-                    document.getElementById('currentUserRole').innerText = currentUser.role.toUpperCase();
-                    
-                    await loadDashboard();
-                    await loadStudents();
-                    await loadVisits();
-                    showAlert('Welcome back, ' + currentUser.first_name + '!', 'success');
+                if (currentUser.role === 'admin') {
+                    document.getElementById('usersNav').style.display = 'flex';
                 } else {
-                    errorDiv.innerHTML = 'Invalid email or password';
-                    errorDiv.style.display = 'block';
-                    setTimeout(() => errorDiv.style.display = 'none', 3000);
+                    document.getElementById('usersNav').style.display = 'none';
                 }
-            } catch(err) {
-                errorDiv.innerHTML = 'Error: ' + err.message;
-                errorDiv.style.display = 'block';
+                
+                await loadDashboard();
+                await loadStudents();
+                await loadVisits();
+                await loadUsers();
+                showAlert('Welcome back, ' + currentUser.first_name + '!', 'success');
+            } else {
+                showLoginError('Invalid email or password');
             }
         });
+        
+        function showLoginError(message) {
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.innerText = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => errorDiv.style.display = 'none', 3000);
+        }
         
         function logout() {
             currentUser = null;
             document.getElementById('dashboard').style.display = 'none';
             document.getElementById('loginPage').style.display = 'flex';
-            document.getElementById('loginEmail').value = '';
-            document.getElementById('loginPassword').value = '';
         }
         
+        // =====================================================
+        // DASHBOARD FUNCTIONS
+        // =====================================================
         async function loadDashboard() {
-            try {
-                const { count: studentCount } = await _supabase.from('students').select('*', { count: 'exact', head: true });
-                const { count: visitCount } = await _supabase.from('visits').select('*', { count: 'exact', head: true });
-                const { data: pendingVisits } = await _supabase.from('visits').select('*').eq('follow_up_needed', true).eq('followed_up', false);
-                
-                document.getElementById('totalStudents').innerText = studentCount || 0;
-                document.getElementById('totalVisits').innerText = visitCount || 0;
-                document.getElementById('pendingFollowups').innerText = pendingVisits?.length || 0;
-            } catch(e) {
-                console.error('Dashboard error:', e);
-            }
+            const { count: studentCount } = await supabase.from('students').select('*', { count: 'exact', head: true });
+            const { count: visitCount } = await supabase.from('visits').select('*', { count: 'exact', head: true });
+            const { data: pendingVisits } = await supabase.from('visits').select('*').eq('follow_up_needed', true).eq('followed_up', false);
+            
+            document.getElementById('totalStudents').innerText = studentCount || 0;
+            document.getElementById('totalVisits').innerText = visitCount || 0;
+            document.getElementById('pendingFollowups').innerText = pendingVisits?.length || 0;
         }
         
+        // =====================================================
+        // STUDENT FUNCTIONS
+        // =====================================================
         async function loadStudents() {
             document.getElementById('studentsLoading').style.display = 'block';
-            try {
-                const { data: students, error } = await _supabase.from('students').select('*').order('id', { ascending: false });
-                document.getElementById('studentsLoading').style.display = 'none';
-                
-                if (error) throw error;
-                
-                const tbody = document.getElementById('studentsTableBody');
-                tbody.innerHTML = '';
-                
-                if (students.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No students found. Add your first student!</td></tr>';
-                    return;
-                }
-                
-                students.forEach(student => {
-                    const row = tbody.insertRow();
-                    row.insertCell(0).innerHTML = student.id;
-                    row.insertCell(1).innerHTML = student.family_name || '-';
-                    row.insertCell(2).innerHTML = student.first_name || '-';
-                    row.insertCell(3).innerHTML = student.nickname || '-';
-                    row.insertCell(4).innerHTML = student.age || '-';
-                    row.insertCell(5).innerHTML = `
-                        <button class="btn-visit" onclick="showVisitModal(${student.id}, '${student.first_name} ${student.family_name}')"><i class="fas fa-book"></i> Log Visit</button>
-                        <button class="btn-delete" onclick="deleteStudent(${student.id})"><i class="fas fa-trash"></i> Delete</button>
-                    `;
-                });
-            } catch(e) {
-                document.getElementById('studentsLoading').style.display = 'none';
-                showAlert('Error loading students: ' + e.message, 'error');
+            const { data: students, error } = await supabase.from('students').select('*').order('id', { ascending: false });
+            document.getElementById('studentsLoading').style.display = 'none';
+            
+            if (error) {
+                showAlert('Error loading students: ' + error.message, 'error');
+                return;
             }
+            
+            const tbody = document.getElementById('studentsTableBody');
+            tbody.innerHTML = '';
+            students.forEach(student => {
+                const row = tbody.insertRow();
+                row.insertCell(0).innerHTML = student.id;
+                row.insertCell(1).innerHTML = student.family_name || '-';
+                row.insertCell(2).innerHTML = student.first_name || '-';
+                row.insertCell(3).innerHTML = student.nickname || '-';
+                row.insertCell(4).innerHTML = student.age || '-';
+                row.insertCell(5).innerHTML = `
+                    <button class="btn-view" onclick="viewStudent(${student.id})"><i class="fas fa-eye"></i> View</button>
+                    <button class="btn-visit" onclick="showVisitModal(${student.id}, '${student.first_name} ${student.family_name}')"><i class="fas fa-book"></i> Log Visit</button>
+                    <button class="btn-print" onclick="printStudentHistory(${student.id})"><i class="fas fa-print"></i> Print</button>
+                    <button class="btn-delete" onclick="deleteStudent(${student.id})"><i class="fas fa-trash"></i> Delete</button>
+                `;
+            });
         }
         
         async function searchStudents() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            try {
-                const { data: students, error } = await _supabase
-                    .from('students')
-                    .select('*')
-                    .or(`family_name.ilike.%${searchTerm}%,first_name.ilike.%${searchTerm}%`);
-                
-                if (error) throw error;
-                
-                const tbody = document.getElementById('studentsTableBody');
-                tbody.innerHTML = '';
-                
-                students.forEach(student => {
-                    const row = tbody.insertRow();
-                    row.insertCell(0).innerHTML = student.id;
-                    row.insertCell(1).innerHTML = student.family_name || '-';
-                    row.insertCell(2).innerHTML = student.first_name || '-';
-                    row.insertCell(3).innerHTML = student.nickname || '-';
-                    row.insertCell(4).innerHTML = student.age || '-';
-                    row.insertCell(5).innerHTML = `<button class="btn-visit" onclick="showVisitModal(${student.id}, '${student.first_name} ${student.family_name}')">Log Visit</button>`;
-                });
-            } catch(e) {
-                showAlert('Search error: ' + e.message, 'error');
+            const { data: students, error } = await supabase
+                .from('students')
+                .select('*')
+                .or(`family_name.ilike.%${searchTerm}%,first_name.ilike.%${searchTerm}%,nickname.ilike.%${searchTerm}%`);
+            
+            if (error) {
+                showAlert('Search error: ' + error.message, 'error');
+                return;
             }
+            
+            const tbody = document.getElementById('studentsTableBody');
+            tbody.innerHTML = '';
+            students.forEach(student => {
+                const row = tbody.insertRow();
+                row.insertCell(0).innerHTML = student.id;
+                row.insertCell(1).innerHTML = student.family_name || '-';
+                row.insertCell(2).innerHTML = student.first_name || '-';
+                row.insertCell(3).innerHTML = student.nickname || '-';
+                row.insertCell(4).innerHTML = student.age || '-';
+                row.insertCell(5).innerHTML = `
+                    <button class="btn-view" onclick="viewStudent(${student.id})">View</button>
+                    <button class="btn-visit" onclick="showVisitModal(${student.id}, '${student.first_name} ${student.family_name}')">Log Visit</button>
+                    <button class="btn-print" onclick="printStudentHistory(${student.id})">Print</button>
+                    <button class="btn-delete" onclick="deleteStudent(${student.id})">Delete</button>
+                `;
+            });
+        }
+        
+        async function viewStudent(id) {
+            const { data: student, error } = await supabase.from('students').select('*').eq('id', id).single();
+            if (error) {
+                showAlert('Error loading student: ' + error.message, 'error');
+                return;
+            }
+            
+            const { data: studentVisits } = await supabase.from('visits').select('*').eq('student_id', id).order('datetime', { ascending: false });
+            
+            const profileDiv = document.getElementById('studentProfile');
+            profileDiv.innerHTML = `
+                <h3>Student Profile: ${student.first_name} ${student.family_name}</h3>
+                <div class="profile-grid">
+                    <div class="info-card">
+                        <h4>Personal Information</h4>
+                        <p><strong>Full Name:</strong> ${student.first_name} ${student.middle_name || ''} ${student.family_name}</p>
+                        <p><strong>Nickname:</strong> ${student.nickname || '-'}</p>
+                        <p><strong>Age:</strong> ${student.age}</p>
+                        <p><strong>Birth Date:</strong> ${student.birth_date || '-'}</p>
+                        <p><strong>Gender:</strong> ${student.gender || '-'}</p>
+                        <p><strong>Address:</strong> ${student.current_address || '-'}</p>
+                        <p><strong>Emergency Contact:</strong> ${student.emergency_contact || '-'}</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Family Background</h4>
+                        <p><strong>Father:</strong> ${student.father_name || '-'} (${student.father_occupation || '-'})</p>
+                        <p><strong>Mother:</strong> ${student.mother_name || '-'} (${student.mother_occupation || '-'})</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Educational Background</h4>
+                        <p><strong>Elementary:</strong> ${student.elem_school || '-'} (${student.elem_year || '-'})</p>
+                        <p><strong>Senior High:</strong> ${student.shs_school || '-'} (${student.shs_year || '-'})</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Unique Features</h4>
+                        <p><strong>Hobbies:</strong> ${student.hobbies || '-'}</p>
+                        <p><strong>Ambitions:</strong> ${student.ambitions || '-'}</p>
+                        <p><strong>Motto:</strong> ${student.motto || '-'}</p>
+                    </div>
+                </div>
+                <div class="info-card" style="margin-top:15px;">
+                    <h4>Visit History (${studentVisits?.length || 0} visits)</h4>
+                    ${studentVisits && studentVisits.length > 0 ? `
+                        <table class="data-table">
+                            <thead><tr><th>Date & Time</th><th>Reason</th><th>Action</th></tr></thead>
+                            <tbody>
+                                ${studentVisits.map(v => `
+                                    <tr>
+                                        <td>${new Date(v.datetime).toLocaleString()}</td>
+                                        <td>${v.reason}</td>
+                                        <td>${v.action || '-'}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    ` : '<p>No visits recorded yet.</p>'}
+                </div>
+            `;
+            profileDiv.style.display = 'block';
         }
         
         async function deleteStudent(id) {
-            if (confirm('Delete this student permanently?')) {
-                try {
-                    const { error } = await _supabase.from('students').delete().eq('id', id);
-                    if (error) throw error;
-                    
-                    showAlert('Student deleted', 'success');
+            if (confirm('Are you sure you want to delete this student record? This will also delete all visit records.')) {
+                const { error } = await supabase.from('students').delete().eq('id', id);
+                if (error) {
+                    showAlert('Error deleting student: ' + error.message, 'error');
+                } else {
+                    showAlert('Student deleted successfully', 'success');
                     await loadStudents();
                     await loadDashboard();
-                } catch(e) {
-                    showAlert('Error: ' + e.message, 'error');
+                    document.getElementById('studentProfile').style.display = 'none';
                 }
             }
         }
         
+        // Add Student
         document.getElementById('addStudentForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const formData = new FormData(e.target);
+            const subjects = Array.from(formData.getAll('subjects')).join(',');
             
             const newStudent = {
                 family_name: formData.get('family_name'),
@@ -415,11 +998,12 @@
                 nickname: formData.get('nickname'),
                 age: parseInt(formData.get('age')) || null,
                 birth_date: formData.get('birth_date'),
+                birth_place: formData.get('birth_place'),
                 gender: formData.get('gender'),
-                current_address: formData.get('current_address'),
-                emergency_contact: formData.get('emergency_contact'),
                 spoken_language: formData.get('spoken_language'),
                 religion: formData.get('religion'),
+                current_address: formData.get('current_address'),
+                emergency_contact: formData.get('emergency_contact'),
                 father_name: formData.get('father_name'),
                 father_occupation: formData.get('father_occupation'),
                 mother_name: formData.get('mother_name'),
@@ -431,88 +1015,81 @@
                 hobbies: formData.get('hobbies'),
                 ambitions: formData.get('ambitions'),
                 motto: formData.get('motto'),
-                characteristics: formData.get('characteristics')
+                characteristics: formData.get('characteristics'),
+                subjects: subjects
             };
             
-            try {
-                const { error } = await _supabase.from('students').insert([newStudent]);
-                if (error) throw error;
-                
+            const { error } = await supabase.from('students').insert([newStudent]);
+            if (error) {
+                showAlert('Error adding student: ' + error.message, 'error');
+            } else {
                 showAlert('Student added successfully!', 'success');
                 e.target.reset();
                 await loadStudents();
                 await loadDashboard();
                 showPanel('students');
-            } catch(e) {
-                showAlert('Error: ' + e.message, 'error');
             }
         });
         
+        // =====================================================
+        // VISIT FUNCTIONS
+        // =====================================================
         async function loadVisits() {
             document.getElementById('visitsLoading').style.display = 'block';
-            try {
-                const { data: visits, error } = await _supabase
-                    .from('visits')
-                    .select('*, students(first_name, family_name)')
-                    .order('datetime', { ascending: false });
-                
-                document.getElementById('visitsLoading').style.display = 'none';
-                if (error) throw error;
-                
-                const tbody = document.getElementById('visitsTableBody');
-                tbody.innerHTML = '';
-                
-                if (visits.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No visits recorded yet.</td></tr>';
-                    return;
-                }
-                
-                visits.forEach(visit => {
-                    const studentName = visit.students ? `${visit.students.first_name} ${visit.students.family_name}` : 'Unknown';
-                    const row = tbody.insertRow();
-                    row.insertCell(0).innerHTML = new Date(visit.datetime).toLocaleString();
-                    row.insertCell(1).innerHTML = studentName;
-                    row.insertCell(2).innerHTML = visit.reason?.substring(0, 50) || '-';
-                    row.insertCell(3).innerHTML = visit.action?.substring(0, 50) || '-';
-                    row.insertCell(4).innerHTML = visit.recorded_by || 'System';
-                    row.insertCell(5).innerHTML = visit.follow_up_needed ? '<span style="color:#ffc107;">⚠️ Follow-up</span>' : '<span style="color:#28a745;">Completed</span>';
-                });
-            } catch(e) {
-                document.getElementById('visitsLoading').style.display = 'none';
-                showAlert('Error loading visits: ' + e.message, 'error');
+            const { data: visits, error } = await supabase
+                .from('visits')
+                .select('*, students(first_name, family_name)')
+                .order('datetime', { ascending: false });
+            document.getElementById('visitsLoading').style.display = 'none';
+            
+            if (error) {
+                showAlert('Error loading visits: ' + error.message, 'error');
+                return;
             }
+            
+            const tbody = document.getElementById('visitsTableBody');
+            tbody.innerHTML = '';
+            visits.forEach(visit => {
+                const studentName = visit.students ? `${visit.students.first_name} ${visit.students.family_name}` : 'Unknown';
+                const row = tbody.insertRow();
+                row.insertCell(0).innerHTML = new Date(visit.datetime).toLocaleString();
+                row.insertCell(1).innerHTML = studentName;
+                row.insertCell(2).innerHTML = visit.reason?.substring(0, 50) + (visit.reason?.length > 50 ? '...' : '') || '-';
+                row.insertCell(3).innerHTML = visit.action?.substring(0, 50) || '-';
+                row.insertCell(4).innerHTML = visit.recorded_by || 'System';
+                row.insertCell(5).innerHTML = visit.follow_up_needed ? '<span style="color:#ffc107;">⚠️ Follow-up</span>' : '<span style="color:#28a745;">Completed</span>';
+            });
         }
         
         async function searchVisits() {
             const searchTerm = document.getElementById('visitSearchInput').value.toLowerCase();
-            try {
-                const { data: visits, error } = await _supabase
-                    .from('visits')
-                    .select('*, students(first_name, family_name)');
-                
-                if (error) throw error;
-                
-                const filtered = visits.filter(v => {
-                    const name = v.students ? `${v.students.first_name} ${v.students.family_name}`.toLowerCase() : '';
-                    return name.includes(searchTerm);
-                });
-                
-                const tbody = document.getElementById('visitsTableBody');
-                tbody.innerHTML = '';
-                
-                filtered.forEach(visit => {
-                    const studentName = visit.students ? `${visit.students.first_name} ${visit.students.family_name}` : 'Unknown';
-                    const row = tbody.insertRow();
-                    row.insertCell(0).innerHTML = new Date(visit.datetime).toLocaleString();
-                    row.insertCell(1).innerHTML = studentName;
-                    row.insertCell(2).innerHTML = visit.reason?.substring(0, 50) || '-';
-                    row.insertCell(3).innerHTML = visit.action?.substring(0, 50) || '-';
-                    row.insertCell(4).innerHTML = visit.recorded_by || 'System';
-                    row.insertCell(5).innerHTML = visit.follow_up_needed ? '⚠️ Follow-up' : 'Completed';
-                });
-            } catch(e) {
-                showAlert('Search error: ' + e.message, 'error');
+            const { data: visits, error } = await supabase
+                .from('visits')
+                .select('*, students(first_name, family_name)')
+                .order('datetime', { ascending: false });
+            
+            if (error) {
+                showAlert('Search error: ' + error.message, 'error');
+                return;
             }
+            
+            const filtered = visits.filter(v => {
+                const studentName = v.students ? `${v.students.first_name} ${v.students.family_name}`.toLowerCase() : '';
+                return studentName.includes(searchTerm);
+            });
+            
+            const tbody = document.getElementById('visitsTableBody');
+            tbody.innerHTML = '';
+            filtered.forEach(visit => {
+                const studentName = visit.students ? `${visit.students.first_name} ${visit.students.family_name}` : 'Unknown';
+                const row = tbody.insertRow();
+                row.insertCell(0).innerHTML = new Date(visit.datetime).toLocaleString();
+                row.insertCell(1).innerHTML = studentName;
+                row.insertCell(2).innerHTML = visit.reason?.substring(0, 50) || '-';
+                row.insertCell(3).innerHTML = visit.action?.substring(0, 50) || '-';
+                row.insertCell(4).innerHTML = visit.recorded_by || 'System';
+                row.insertCell(5).innerHTML = visit.follow_up_needed ? '⚠️ Follow-up' : 'Completed';
+            });
         }
         
         function showVisitModal(studentId, studentName) {
@@ -543,44 +1120,86 @@
                 return;
             }
             
-            try {
-                const { error } = await _supabase.from('visits').insert([{
-                    student_id: studentId,
-                    datetime: datetime,
-                    reason: reason,
-                    concerns: concerns,
-                    action: action,
-                    follow_up_needed: followUpNeeded,
-                    recorded_by: currentUser?.first_name + ' ' + currentUser?.last_name || 'System'
-                }]);
-                
-                if (error) throw error;
-                
+            const newVisit = {
+                student_id: studentId,
+                datetime: datetime,
+                reason: reason,
+                concerns: concerns,
+                action: action,
+                follow_up_needed: followUpNeeded,
+                followed_up: false,
+                recorded_by: currentUser?.first_name + ' ' + currentUser?.last_name || 'System'
+            };
+            
+            const { error } = await supabase.from('visits').insert([newVisit]);
+            if (error) {
+                alert('Error saving visit: ' + error.message);
+            } else {
                 closeVisitModal();
                 await loadVisits();
                 await loadDashboard();
                 showAlert('Visit recorded successfully!', 'success');
-            } catch(e) {
-                alert('Error saving visit: ' + e.message);
             }
         }
         
+        function printStudentHistory(studentId) {
+            window.open(`print_history.html?student_id=${studentId}`, '_blank');
+        }
+        
+        // =====================================================
+        // USER MANAGEMENT (Admin only)
+        // =====================================================
+        async function loadUsers() {
+            if (!currentUser || currentUser.role !== 'admin') return;
+            const { data: users, error } = await supabase.from('users').select('*');
+            if (error) return;
+            
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+            users.forEach(user => {
+                const row = tbody.insertRow();
+                row.insertCell(0).innerHTML = `${user.first_name} ${user.last_name}`;
+                row.insertCell(1).innerHTML = user.email;
+                row.insertCell(2).innerHTML = user.role;
+            });
+        }
+        
+        document.getElementById('addUserForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            if (!currentUser || currentUser.role !== 'admin') return;
+            
+            const formData = new FormData(e.target);
+            const newUser = {
+                email: formData.get('email'),
+                password: formData.get('password'),
+                first_name: formData.get('first_name'),
+                last_name: formData.get('last_name'),
+                role: formData.get('role')
+            };
+            
+            const { error } = await supabase.from('users').insert([newUser]);
+            if (error) {
+                showAlert('Error adding user: ' + error.message, 'error');
+            } else {
+                showAlert('User added successfully!', 'success');
+                e.target.reset();
+                await loadUsers();
+            }
+        });
+        
+        // =====================================================
+        // UTILITY FUNCTIONS
+        // =====================================================
         function showPanel(panelName) {
-            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
             document.getElementById(`panel-${panelName}`).classList.add('active');
             
-            const titles = {
-                dashboard: 'Dashboard',
-                students: 'Student Records',
-                addStudent: 'Add New Student',
-                visits: 'Visit Logs'
-            };
+            const titles = { dashboard: 'Dashboard', students: 'Student Records', addStudent: 'Add New Student', visits: 'Visit Logs', users: 'User Management' };
             document.getElementById('pageTitle').innerText = titles[panelName] || panelName;
             
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             if (event && event.target) {
-                const target = event.target.closest('.nav-item');
-                if (target) target.classList.add('active');
+                event.target.closest('.nav-item').classList.add('active');
             }
         }
         
@@ -593,6 +1212,7 @@
             setTimeout(() => alert.remove(), 3000);
         }
         
+        // Close modal when clicking outside
         window.onclick = function(event) {
             const modal = document.getElementById('visitModal');
             if (event.target === modal) closeVisitModal();
