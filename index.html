@@ -6,7 +6,6 @@
     <title>Guidance Office System | City College of Davao</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -16,7 +15,8 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: #f0f2f5;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
 
         /* Sidebar */
@@ -24,7 +24,7 @@
             position: fixed;
             left: 0;
             top: 0;
-            width: 260px;
+            width: 280px;
             height: 100%;
             background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
             color: white;
@@ -74,7 +74,7 @@
 
         /* Main Content */
         .main-content {
-            margin-left: 260px;
+            margin-left: 280px;
             padding: 20px;
         }
 
@@ -196,7 +196,7 @@
         }
 
         /* Buttons */
-        .btn-view, .btn-delete, .btn-visit {
+        .btn-view, .btn-delete, .btn-visit, .btn-print {
             padding: 6px 12px;
             border: none;
             border-radius: 6px;
@@ -217,6 +217,11 @@
 
         .btn-visit {
             background: #f59e0b;
+            color: white;
+        }
+
+        .btn-print {
+            background: #6366f1;
             color: white;
         }
 
@@ -370,7 +375,7 @@
 
         @media (max-width: 768px) {
             .sidebar {
-                left: -260px;
+                left: -280px;
             }
             .main-content {
                 margin-left: 0;
@@ -401,7 +406,7 @@
             </div>
         </div>
         <div class="user-info">
-            <div style="font-weight: 600;">Guidance Counselor</div>
+            <div style="font-weight: 600;"><i class="fas fa-user-shield"></i> Guidance Counselor</div>
             <div style="font-size: 12px; opacity: 0.7;">CCD Staff</div>
         </div>
     </div>
@@ -410,7 +415,7 @@
     <div class="main-content">
         <div class="top-bar">
             <div class="page-title" id="pageTitle">Dashboard</div>
-            <div><i class="fas fa-cloud-upload-alt"></i> <span id="connectionStatus">Connected</span></div>
+            <div><i class="fas fa-database"></i> <span>Local Storage</span></div>
         </div>
         <div id="alertContainer"></div>
 
@@ -440,8 +445,10 @@
                 </div>
             </div>
             <div class="info-card">
-                <h4>Welcome to Guidance Office System</h4>
-                <p>This system is connected to Supabase database. All data is synced in real-time.</p>
+                <h4><i class="fas fa-info-circle"></i> About This System</h4>
+                <p>This is a standalone HTML system that stores all data in your browser's local storage.</p>
+                <p><strong>Features:</strong> Add students, log visits, view history, print reports.</p>
+                <p><strong>Data stays on this computer only.</strong></p>
             </div>
         </div>
 
@@ -449,10 +456,9 @@
         <div id="panel-students" class="panel">
             <div class="search-bar">
                 <input type="text" id="searchInput" placeholder="Search by name...">
-                <button onclick="searchStudents()">Search</button>
-                <button onclick="loadStudents()">Refresh</button>
+                <button onclick="searchStudents()"><i class="fas fa-search"></i> Search</button>
+                <button onclick="loadStudents()"><i class="fas fa-sync"></i> Refresh</button>
             </div>
-            <div id="studentsLoading" class="loading" style="display: none;">Loading...</div>
             <div style="overflow-x: auto;">
                 <table class="data-table">
                     <thead>
@@ -466,9 +472,9 @@
 
         <!-- Add Student Panel -->
         <div id="panel-addStudent" class="panel">
-            <form id="addStudentForm">
+            <form id="addStudentForm" onsubmit="event.preventDefault(); addStudent();">
                 <div class="form-section">
-                    <h3>Personal Information</h3>
+                    <h3><i class="fas fa-user"></i> Personal Information</h3>
                     <div class="form-row">
                         <div class="form-group"><label>Family Name *</label><input type="text" id="family_name" required></div>
                         <div class="form-group"><label>First Name *</label><input type="text" id="first_name" required></div>
@@ -489,7 +495,7 @@
                 </div>
 
                 <div class="form-section">
-                    <h3>Family Background</h3>
+                    <h3><i class="fas fa-family"></i> Family Background</h3>
                     <div class="form-row">
                         <div class="form-group"><label>Father's Name</label><input type="text" id="father_name"></div>
                         <div class="form-group"><label>Father's Occupation</label><input type="text" id="father_occupation"></div>
@@ -501,7 +507,7 @@
                 </div>
 
                 <div class="form-section">
-                    <h3>Educational Background</h3>
+                    <h3><i class="fas fa-graduation-cap"></i> Educational Background</h3>
                     <div class="form-row">
                         <div class="form-group"><label>Elementary School</label><input type="text" id="elem_school"></div>
                         <div class="form-group"><label>Year Graduated</label><input type="number" id="elem_year"></div>
@@ -513,7 +519,7 @@
                 </div>
 
                 <div class="form-section">
-                    <h3>Unique Features</h3>
+                    <h3><i class="fas fa-star"></i> Unique Features</h3>
                     <div class="form-row">
                         <div class="form-group"><label>Hobbies</label><input type="text" id="hobbies"></div>
                         <div class="form-group"><label>Ambitions</label><input type="text" id="ambitions"></div>
@@ -524,7 +530,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn-submit">Save Student Record</button>
+                <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Save Student Record</button>
             </form>
         </div>
 
@@ -532,14 +538,14 @@
         <div id="panel-visits" class="panel">
             <div class="search-bar">
                 <input type="text" id="visitSearchInput" placeholder="Search by student name...">
-                <button onclick="searchVisits()">Search</button>
-                <button onclick="loadVisits()">Refresh</button>
+                <button onclick="searchVisits()"><i class="fas fa-search"></i> Search</button>
+                <button onclick="loadVisits()"><i class="fas fa-sync"></i> Refresh</button>
+                <button onclick="exportToCSV()" style="background: #10b981;"><i class="fas fa-download"></i> Export CSV</button>
             </div>
-            <div id="visitsLoading" class="loading" style="display: none;">Loading...</div>
             <div style="overflow-x: auto;">
                 <table class="data-table">
                     <thead>
-                        <tr><th>Date & Time</th><th>Student</th><th>Reason</th><th>Action Taken</th><th>Status</th></tr>
+                        <tr><th>Date & Time</th><th>Student</th><th>Reason</th><th>Action Taken</th><th>Status</th><th>Actions</th></tr>
                     </thead>
                     <tbody id="visitsTableBody"></tbody>
                 </table>
@@ -552,14 +558,14 @@
 <div id="visitModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3>Log Student Visit</h3>
+            <h3><i class="fas fa-clipboard-list"></i> Log Student Visit</h3>
             <span class="modal-close" onclick="closeVisitModal()">&times;</span>
         </div>
         <div class="modal-body">
             <input type="hidden" id="visitStudentId">
             <div class="form-group">
                 <label>Student:</label>
-                <strong id="visitStudentName"></strong>
+                <strong id="visitStudentName" style="display: block; background: #f8f9fa; padding: 8px; border-radius: 6px;"></strong>
             </div>
             <div class="form-group">
                 <label>Date & Time *</label>
@@ -567,11 +573,15 @@
             </div>
             <div class="form-group">
                 <label>Reason for Visit *</label>
-                <textarea id="visitReason" rows="3" required></textarea>
+                <textarea id="visitReason" rows="3" required placeholder="e.g., Academic concerns, Personal issues, Career guidance..."></textarea>
             </div>
             <div class="form-group">
-                <label>Action Taken</label>
-                <textarea id="visitAction" rows="2"></textarea>
+                <label>Concerns Discussed</label>
+                <textarea id="visitConcerns" rows="2" placeholder="What did the student share?"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Action Taken / Recommendations</label>
+                <textarea id="visitAction" rows="2" placeholder="What advice or action was given?"></textarea>
             </div>
             <div class="form-group">
                 <label><input type="checkbox" id="followUpNeeded"> Follow-up needed</label>
@@ -579,20 +589,50 @@
         </div>
         <div class="modal-footer" style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
             <button onclick="closeVisitModal()" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer;">Cancel</button>
-            <button onclick="saveVisit()" style="padding: 10px 20px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer;">Save</button>
+            <button onclick="saveVisit()" style="padding: 10px 20px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer;">Save Visit</button>
         </div>
     </div>
 </div>
 
 <script>
-    // Supabase Configuration
-    const SUPABASE_URL = 'https://gsegjsolnwxgzdvteedc.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZWdqc29sbnd4Z3pkdnRlZWRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NDUzMzUsImV4cCI6MjA5NTUyMTMzNX0.oJhiyGHOpMArmTequaTBAKYokpN23aQOr9B4ydGPIeY';
-    
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    let allStudents = [];
+    // Data Storage - Using localStorage
+    let students = [];
+    let visits = [];
+    let nextStudentId = 1;
+    let nextVisitId = 1;
 
-    // Navigation Function
+    // Load data from localStorage on page load
+    function loadDataFromStorage() {
+        const storedStudents = localStorage.getItem('guidance_students');
+        const storedVisits = localStorage.getItem('guidance_visits');
+        
+        if (storedStudents) {
+            students = JSON.parse(storedStudents);
+            nextStudentId = students.length > 0 ? Math.max(...students.map(s => s.id)) + 1 : 1;
+        } else {
+            // Sample data
+            students = [
+                { id: 1, family_name: 'Lapao', first_name: 'Clarence', middle_name: 'Copyz', nickname: 'Alien', age: 14, birth_date: '2010-01-17', gender: 'Male', current_address: 'Tanboy, Davao City', emergency_contact: 'Larry Lapao - 0942154481', father_name: 'Larry Lapao', father_occupation: 'Farmer', mother_name: 'Chitrevine', mother_occupation: 'Farmer', elem_school: 'Tanbong Elementary School', elem_year: 2017, shs_school: 'Baguio National School of Arts and Trades', shs_year: 2023, hobbies: 'Playing Basketball', ambitions: 'Good Basketball Player', motto: 'I Know I Can Do It', characteristics: 'Lazy' }
+            ];
+            nextStudentId = 2;
+        }
+        
+        if (storedVisits) {
+            visits = JSON.parse(storedVisits);
+            nextVisitId = visits.length > 0 ? Math.max(...visits.map(v => v.id)) + 1 : 1;
+        } else {
+            visits = [];
+            nextVisitId = 1;
+        }
+    }
+
+    // Save data to localStorage
+    function saveDataToStorage() {
+        localStorage.setItem('guidance_students', JSON.stringify(students));
+        localStorage.setItem('guidance_visits', JSON.stringify(visits));
+    }
+
+    // Navigation
     function showPanel(panelName) {
         document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
         document.getElementById(`panel-${panelName}`).classList.add('active');
@@ -611,64 +651,49 @@
         // Hide profile view when switching panels
         const profileView = document.getElementById('studentProfileView');
         if (profileView) profileView.style.display = 'none';
+        
+        // Refresh data when switching to certain panels
+        if (panelName === 'students') loadStudents();
+        if (panelName === 'visits') loadVisits();
+        if (panelName === 'dashboard') loadDashboard();
     }
 
     // Load Dashboard Stats
-    async function loadDashboard() {
-        try {
-            const { count: studentCount } = await supabase.from('students').select('*', { count: 'exact', head: true });
-            const { count: visitCount } = await supabase.from('visits').select('*', { count: 'exact', head: true });
-            const { data: followups } = await supabase.from('visits').select('*').eq('follow_up_needed', true);
-            
-            document.getElementById('totalStudents').innerText = studentCount || 0;
-            document.getElementById('totalVisits').innerText = visitCount || 0;
-            document.getElementById('pendingFollowups').innerText = followups?.length || 0;
-        } catch(e) {
-            console.error('Dashboard error:', e);
-        }
+    function loadDashboard() {
+        document.getElementById('totalStudents').innerText = students.length;
+        document.getElementById('totalVisits').innerText = visits.length;
+        const pending = visits.filter(v => v.follow_up_needed === true).length;
+        document.getElementById('pendingFollowups').innerText = pending;
     }
 
     // Load Students
-    async function loadStudents() {
-        const loadingDiv = document.getElementById('studentsLoading');
-        loadingDiv.style.display = 'block';
+    function loadStudents() {
+        const tbody = document.getElementById('studentsTableBody');
+        tbody.innerHTML = '';
         
-        try {
-            const { data: students, error } = await supabase.from('students').select('*').order('id', { ascending: false });
-            loadingDiv.style.display = 'none';
-            
-            if (error) throw error;
-            
-            allStudents = students;
-            const tbody = document.getElementById('studentsTableBody');
-            tbody.innerHTML = '';
-            
-            if (students.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No students found. Add your first student!</td></tr>';
-                return;
-            }
-            
-            students.forEach(student => {
-                const row = tbody.insertRow();
-                row.insertCell(0).innerHTML = student.id;
-                row.insertCell(1).innerHTML = student.family_name || '-';
-                row.insertCell(2).innerHTML = student.first_name || '-';
-                row.insertCell(3).innerHTML = student.nickname || '-';
-                row.insertCell(4).innerHTML = student.age || '-';
-                row.insertCell(5).innerHTML = `
-                    <button class="btn-view" onclick="viewStudent(${student.id})"><i class="fas fa-eye"></i> View</button>
-                    <button class="btn-visit" onclick="showVisitModal(${student.id}, '${student.first_name} ${student.family_name}')"><i class="fas fa-calendar-plus"></i> Log Visit</button>
-                    <button class="btn-delete" onclick="deleteStudent(${student.id})"><i class="fas fa-trash"></i> Delete</button>
-                `;
-            });
-        } catch(e) {
-            loadingDiv.style.display = 'none';
-            showAlert('Error loading students: ' + e.message, 'error');
+        if (students.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No students found. Click "Add Student" to add one!</td></tr>';
+            return;
         }
+        
+        students.forEach(student => {
+            const row = tbody.insertRow();
+            row.insertCell(0).innerHTML = student.id;
+            row.insertCell(1).innerHTML = student.family_name || '-';
+            row.insertCell(2).innerHTML = student.first_name || '-';
+            row.insertCell(3).innerHTML = student.nickname || '-';
+            row.insertCell(4).innerHTML = student.age || '-';
+            row.insertCell(5).innerHTML = `
+                <button class="btn-view" onclick="viewStudent(${student.id})"><i class="fas fa-eye"></i> View</button>
+                <button class="btn-visit" onclick="showVisitModal(${student.id}, '${student.first_name} ${student.family_name}')"><i class="fas fa-calendar-plus"></i> Log Visit</button>
+                <button class="btn-print" onclick="printStudentHistory(${student.id})"><i class="fas fa-print"></i> Print</button>
+                <button class="btn-delete" onclick="deleteStudent(${student.id})"><i class="fas fa-trash"></i> Delete</button>
+            `;
+        });
     }
 
     // Search Students
-    async function searchStudents() {
+    function searchStudents() {
         const searchTerm = document.getElementById('searchInput').value.toLowerCase();
         
         if (!searchTerm) {
@@ -676,7 +701,7 @@
             return;
         }
         
-        const filtered = allStudents.filter(s => 
+        const filtered = students.filter(s => 
             (s.family_name && s.family_name.toLowerCase().includes(searchTerm)) ||
             (s.first_name && s.first_name.toLowerCase().includes(searchTerm)) ||
             (s.nickname && s.nickname.toLowerCase().includes(searchTerm))
@@ -700,38 +725,40 @@
             row.insertCell(5).innerHTML = `
                 <button class="btn-view" onclick="viewStudent(${student.id})">View</button>
                 <button class="btn-visit" onclick="showVisitModal(${student.id}, '${student.first_name} ${student.family_name}')">Log Visit</button>
+                <button class="btn-print" onclick="printStudentHistory(${student.id})">Print</button>
                 <button class="btn-delete" onclick="deleteStudent(${student.id})">Delete</button>
             `;
         });
     }
 
     // View Student Details
-    async function viewStudent(id) {
-        const student = allStudents.find(s => s.id === id);
+    function viewStudent(id) {
+        const student = students.find(s => s.id === id);
         if (!student) return;
         
-        const { data: visits } = await supabase.from('visits').select('*').eq('student_id', id).order('datetime', { ascending: false });
+        const studentVisits = visits.filter(v => v.student_id === id).sort((a,b) => new Date(b.datetime) - new Date(a.datetime));
         
         let visitsHtml = '';
-        if (visits && visits.length > 0) {
-            visitsHtml = '<table class="data-table"><thead><tr><th>Date</th><th>Reason</th><th>Action</th></tr></thead><tbody>';
-            visits.forEach(v => {
+        if (studentVisits.length > 0) {
+            visitsHtml = '<table class="data-table"><thead><tr><th>Date & Time</th><th>Reason</th><th>Action</th><th>Status</th></tr></thead><tbody>';
+            studentVisits.forEach(v => {
                 visitsHtml += `<tr>
                     <td>${new Date(v.datetime).toLocaleString()}</td>
                     <td>${v.reason || '-'}</td>
                     <td>${v.action || '-'}</td>
+                    <td>${v.follow_up_needed ? '⚠️ Follow-up' : '✓ Completed'}</td>
                 </tr>`;
             });
             visitsHtml += '</tbody></table>';
         } else {
-            visitsHtml = '<p>No visit records yet.</p>';
+            visitsHtml = '<p>No visit records yet. Click "Log Visit" to add one.</p>';
         }
         
         const profileHtml = `
-            <h3>Student Profile: ${student.first_name} ${student.family_name}</h3>
+            <h3><i class="fas fa-user-graduate"></i> Student Profile: ${student.first_name} ${student.family_name}</h3>
             <div class="profile-grid">
                 <div class="info-card">
-                    <h4>Personal Information</h4>
+                    <h4><i class="fas fa-id-card"></i> Personal Information</h4>
                     <p><strong>Full Name:</strong> ${student.first_name} ${student.middle_name || ''} ${student.family_name}</p>
                     <p><strong>Nickname:</strong> ${student.nickname || '-'}</p>
                     <p><strong>Age:</strong> ${student.age || '-'}</p>
@@ -739,27 +766,30 @@
                     <p><strong>Gender:</strong> ${student.gender || '-'}</p>
                     <p><strong>Address:</strong> ${student.current_address || '-'}</p>
                     <p><strong>Emergency Contact:</strong> ${student.emergency_contact || '-'}</p>
+                    <p><strong>Language:</strong> ${student.spoken_language || '-'} | <strong>Religion:</strong> ${student.religion || '-'}</p>
                 </div>
                 <div class="info-card">
-                    <h4>Family Background</h4>
+                    <h4><i class="fas fa-family"></i> Family Background</h4>
                     <p><strong>Father:</strong> ${student.father_name || '-'} (${student.father_occupation || '-'})</p>
                     <p><strong>Mother:</strong> ${student.mother_name || '-'} (${student.mother_occupation || '-'})</p>
                 </div>
                 <div class="info-card">
-                    <h4>Educational Background</h4>
+                    <h4><i class="fas fa-graduation-cap"></i> Educational Background</h4>
                     <p><strong>Elementary:</strong> ${student.elem_school || '-'} (${student.elem_year || '-'})</p>
                     <p><strong>Senior High:</strong> ${student.shs_school || '-'} (${student.shs_year || '-'})</p>
                 </div>
                 <div class="info-card">
-                    <h4>Unique Features</h4>
+                    <h4><i class="fas fa-star"></i> Unique Features</h4>
                     <p><strong>Hobbies:</strong> ${student.hobbies || '-'}</p>
                     <p><strong>Ambitions:</strong> ${student.ambitions || '-'}</p>
                     <p><strong>Motto:</strong> ${student.motto || '-'}</p>
+                    <p><strong>Characteristics:</strong> ${student.characteristics || '-'}</p>
                 </div>
             </div>
             <div class="info-card" style="margin-top:15px;">
-                <h4>Visit History (${visits?.length || 0})</h4>
+                <h4><i class="fas fa-history"></i> Visit History (${studentVisits.length} visits)</h4>
                 ${visitsHtml}
+                <button class="btn-print" onclick="printStudentHistory(${student.id})" style="margin-top:10px;"><i class="fas fa-print"></i> Print Full Report</button>
             </div>
         `;
         
@@ -770,27 +800,22 @@
     }
 
     // Delete Student
-    async function deleteStudent(id) {
+    function deleteStudent(id) {
         if (confirm('Are you sure? This will delete the student and all their visit records.')) {
-            await supabase.from('visits').delete().eq('student_id', id);
-            const { error } = await supabase.from('students').delete().eq('id', id);
-            
-            if (error) {
-                showAlert('Error: ' + error.message, 'error');
-            } else {
-                showAlert('Student deleted successfully', 'success');
-                await loadStudents();
-                await loadDashboard();
-                document.getElementById('studentProfileView').style.display = 'none';
-            }
+            students = students.filter(s => s.id !== id);
+            visits = visits.filter(v => v.student_id !== id);
+            saveDataToStorage();
+            loadStudents();
+            loadDashboard();
+            document.getElementById('studentProfileView').style.display = 'none';
+            showAlert('Student deleted successfully', 'success');
         }
     }
 
-    // Add Student Form Submit
-    document.getElementById('addStudentForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
+    // Add Student
+    function addStudent() {
         const newStudent = {
+            id: nextStudentId++,
             family_name: document.getElementById('family_name').value,
             first_name: document.getElementById('first_name').value,
             middle_name: document.getElementById('middle_name').value,
@@ -816,69 +841,64 @@
             characteristics: document.getElementById('characteristics').value
         };
         
-        const { error } = await supabase.from('students').insert([newStudent]);
-        
-        if (error) {
-            showAlert('Error: ' + error.message, 'error');
-        } else {
-            showAlert('Student added successfully!', 'success');
-            this.reset();
-            await loadStudents();
-            await loadDashboard();
-            showPanel('students');
+        if (!newStudent.family_name || !newStudent.first_name) {
+            showAlert('Please fill in Family Name and First Name', 'error');
+            return;
         }
-    });
+        
+        students.push(newStudent);
+        saveDataToStorage();
+        
+        document.getElementById('addStudentForm').reset();
+        loadStudents();
+        loadDashboard();
+        showAlert('Student added successfully!', 'success');
+        showPanel('students');
+    }
 
     // Load Visits
-    async function loadVisits() {
-        const loadingDiv = document.getElementById('visitsLoading');
-        loadingDiv.style.display = 'block';
+    function loadVisits() {
+        const tbody = document.getElementById('visitsTableBody');
+        tbody.innerHTML = '';
         
-        try {
-            const { data: visits, error } = await supabase
-                .from('visits')
-                .select('*, students(first_name, family_name)')
-                .order('datetime', { ascending: false });
-            
-            loadingDiv.style.display = 'none';
-            
-            if (error) throw error;
-            
-            const tbody = document.getElementById('visitsTableBody');
-            tbody.innerHTML = '';
-            
-            if (visits.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No visits recorded yet</td></tr>';
-                return;
-            }
-            
-            visits.forEach(visit => {
-                const studentName = visit.students ? `${visit.students.first_name} ${visit.students.family_name}` : 'Unknown';
-                const row = tbody.insertRow();
-                row.insertCell(0).innerHTML = new Date(visit.datetime).toLocaleString();
-                row.insertCell(1).innerHTML = studentName;
-                row.insertCell(2).innerHTML = visit.reason?.substring(0, 50) || '-';
-                row.insertCell(3).innerHTML = visit.action?.substring(0, 50) || '-';
-                row.insertCell(4).innerHTML = visit.follow_up_needed ? '⚠️ Follow-up needed' : '✓ Completed';
-            });
-        } catch(e) {
-            loadingDiv.style.display = 'none';
-            showAlert('Error loading visits: ' + e.message, 'error');
+        if (visits.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No visits recorded yet. Click "Log Visit" to add one. </td></tr>';
+            return;
+        }
+        
+        const sortedVisits = [...visits].sort((a,b) => new Date(b.datetime) - new Date(a.datetime));
+        
+        sortedVisits.forEach(visit => {
+            const student = students.find(s => s.id === visit.student_id);
+            const studentName = student ? `${student.first_name} ${student.family_name}` : 'Unknown';
+            const row = tbody.insertRow();
+            row.insertCell(0).innerHTML = new Date(visit.datetime).toLocaleString();
+            row.insertCell(1).innerHTML = `<strong>${studentName}</strong>`;
+            row.insertCell(2).innerHTML = visit.reason?.substring(0, 50) || '-';
+            row.insertCell(3).innerHTML = visit.action?.substring(0, 50) || '-';
+            row.insertCell(4).innerHTML = visit.follow_up_needed ? '<span style="background:#fef3c7; color:#92400e; padding:3px 8px; border-radius:12px;">⚠️ Follow-up</span>' : '<span style="background:#d4edda; color:#155724; padding:3px 8px; border-radius:12px;">✓ Completed</span>';
+            row.insertCell(5).innerHTML = `<button class="btn-delete" onclick="deleteVisit(${visit.id})"><i class="fas fa-trash"></i> Delete</button>`;
+        });
+    }
+
+    // Delete Visit
+    function deleteVisit(id) {
+        if (confirm('Delete this visit record?')) {
+            visits = visits.filter(v => v.id !== id);
+            saveDataToStorage();
+            loadVisits();
+            loadDashboard();
+            showAlert('Visit deleted', 'success');
         }
     }
 
     // Search Visits
-    async function searchVisits() {
+    function searchVisits() {
         const searchTerm = document.getElementById('visitSearchInput').value.toLowerCase();
         
-        const { data: visits, error } = await supabase
-            .from('visits')
-            .select('*, students(first_name, family_name)');
-        
-        if (error) return;
-        
         const filtered = visits.filter(v => {
-            const studentName = v.students ? `${v.students.first_name} ${v.students.family_name}`.toLowerCase() : '';
+            const student = students.find(s => s.id === v.student_id);
+            const studentName = student ? `${student.first_name} ${student.family_name}`.toLowerCase() : '';
             return studentName.includes(searchTerm);
         });
         
@@ -886,27 +906,56 @@
         tbody.innerHTML = '';
         
         if (filtered.length === 0) {
-            tbody.innerHTML = '<td><td colspan="5" style="text-align:center;">No matching visits found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No matching visits found</td></tr>';
             return;
         }
         
-        filtered.forEach(visit => {
-            const studentName = visit.students ? `${visit.students.first_name} ${visit.students.family_name}` : 'Unknown';
+        const sortedVisits = [...filtered].sort((a,b) => new Date(b.datetime) - new Date(a.datetime));
+        
+        sortedVisits.forEach(visit => {
+            const student = students.find(s => s.id === visit.student_id);
+            const studentName = student ? `${student.first_name} ${student.family_name}` : 'Unknown';
             const row = tbody.insertRow();
             row.insertCell(0).innerHTML = new Date(visit.datetime).toLocaleString();
-            row.insertCell(1).innerHTML = studentName;
+            row.insertCell(1).innerHTML = `<strong>${studentName}</strong>`;
             row.insertCell(2).innerHTML = visit.reason?.substring(0, 50) || '-';
             row.insertCell(3).innerHTML = visit.action?.substring(0, 50) || '-';
-            row.insertCell(4).innerHTML = visit.follow_up_needed ? '⚠️ Follow-up needed' : '✓ Completed';
+            row.insertCell(4).innerHTML = visit.follow_up_needed ? '⚠️ Follow-up' : '✓ Completed';
+            row.insertCell(5).innerHTML = `<button class="btn-delete" onclick="deleteVisit(${visit.id})">Delete</button>`;
         });
+    }
+
+    // Export to CSV
+    function exportToCSV() {
+        if (visits.length === 0) {
+            showAlert('No data to export', 'error');
+            return;
+        }
+        
+        let csv = '"Date","Student","Reason","Action","Follow-up"\n';
+        visits.forEach(visit => {
+            const student = students.find(s => s.id === visit.student_id);
+            const studentName = student ? `${student.first_name} ${student.family_name}` : 'Unknown';
+            csv += `"${new Date(visit.datetime).toLocaleString()}","${studentName}","${(visit.reason || '').replace(/"/g, '""')}","${(visit.action || '').replace(/"/g, '""')}","${visit.follow_up_needed ? 'Yes' : 'No'}"\n`;
+        });
+        
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `visits_export_${new Date().toISOString().slice(0,19)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showAlert('Export completed!', 'success');
     }
 
     // Show Visit Modal
     function showVisitModal(studentId, studentName) {
         document.getElementById('visitStudentId').value = studentId;
-        document.getElementById('visitStudentName').innerText = studentName;
+        document.getElementById('visitStudentName').innerHTML = studentName;
         document.getElementById('visitDateTime').value = new Date().toISOString().slice(0, 16);
         document.getElementById('visitReason').value = '';
+        document.getElementById('visitConcerns').value = '';
         document.getElementById('visitAction').value = '';
         document.getElementById('followUpNeeded').checked = false;
         document.getElementById('visitModal').style.display = 'block';
@@ -918,10 +967,11 @@
     }
 
     // Save Visit
-    async function saveVisit() {
+    function saveVisit() {
         const studentId = parseInt(document.getElementById('visitStudentId').value);
         const datetime = document.getElementById('visitDateTime').value;
         const reason = document.getElementById('visitReason').value;
+        const concerns = document.getElementById('visitConcerns').value;
         const action = document.getElementById('visitAction').value;
         const followUpNeeded = document.getElementById('followUpNeeded').checked;
         
@@ -930,23 +980,95 @@
             return;
         }
         
-        const { error } = await supabase.from('visits').insert([{
+        const newVisit = {
+            id: nextVisitId++,
             student_id: studentId,
             datetime: datetime,
             reason: reason,
+            concerns: concerns,
             action: action,
             follow_up_needed: followUpNeeded,
             recorded_by: 'Guidance Counselor'
-        }]);
+        };
         
-        if (error) {
-            alert('Error: ' + error.message);
-        } else {
-            closeVisitModal();
-            await loadVisits();
-            await loadDashboard();
-            showAlert('Visit recorded successfully!', 'success');
-        }
+        visits.push(newVisit);
+        saveDataToStorage();
+        closeVisitModal();
+        loadVisits();
+        loadDashboard();
+        showAlert('Visit recorded successfully!', 'success');
+    }
+
+    // Print Student History
+    function printStudentHistory(studentId) {
+        const student = students.find(s => s.id === studentId);
+        if (!student) return;
+        
+        const studentVisits = visits.filter(v => v.student_id === studentId).sort((a,b) => new Date(b.datetime) - new Date(a.datetime));
+        
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Student Report - ${student.first_name} ${student.family_name}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 30px; }
+                    .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px; }
+                    .header h1 { font-size: 24px; color: #1e293b; }
+                    .student-info { background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; vertical-align: top; }
+                    th { background: #4f46e5; color: white; }
+                    .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #777; }
+                    @media print { th { background: #4f46e5 !important; -webkit-print-color-adjust: exact; } }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>CITY COLLEGE OF DAVAO</h1>
+                    <h2>Guidance Office - Student Visit History Report</h2>
+                    <p>Generated: ${new Date().toLocaleString()}</p>
+                </div>
+                <div class="student-info">
+                    <h3>Student Information</h3>
+                    <p><strong>Name:</strong> ${student.first_name} ${student.middle_name || ''} ${student.family_name}</p>
+                    <p><strong>Nickname:</strong> ${student.nickname || '-'}</p>
+                    <p><strong>Age/Birth Date:</strong> ${student.age || '-'} / ${student.birth_date || '-'}</p>
+                    <p><strong>Gender:</strong> ${student.gender || '-'}</p>
+                    <p><strong>Address:</strong> ${student.current_address || '-'}</p>
+                    <p><strong>Emergency Contact:</strong> ${student.emergency_contact || '-'}</p>
+                    <p><strong>Father:</strong> ${student.father_name || '-'} | <strong>Mother:</strong> ${student.mother_name || '-'}</p>
+                </div>
+                <h3>Visit History (${studentVisits.length} visits)</h3>
+                ${studentVisits.length > 0 ? `
+                    <table>
+                        <thead>
+                            <tr><th>#</th><th>Date & Time</th><th>Reason for Visit</th><th>Concerns</th><th>Action Taken</th><th>Status</th></tr>
+                        </thead>
+                        <tbody>
+                            ${studentVisits.map((v, i) => `
+                                <tr>
+                                    <td>${i+1}</td>
+                                    <td>${new Date(v.datetime).toLocaleString()}</td>
+                                    <td>${v.reason || '-'}</td>
+                                    <td>${v.concerns || '-'}</td>
+                                    <td>${v.action || '-'}</td>
+                                    <td>${v.follow_up_needed ? '⚠️ Follow-up Needed' : '✓ Completed'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                ` : '<p>No visit records found.</p>'}
+                <div class="footer">
+                    <p>This is a computer-generated document. Confidential Student Record.</p>
+                    <p>Guidance Office - City College of Davao</p>
+                </div>
+                <script>window.onload = function() { window.print(); setTimeout(window.close, 500); }<\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
     }
 
     // Show Alert
@@ -968,12 +1090,10 @@
     };
 
     // Initialize
-    window.addEventListener('DOMContentLoaded', async () => {
-        await loadDashboard();
-        await loadStudents();
-        await loadVisits();
-        showAlert('System ready! Connected to database.', 'success');
-    });
+    loadDataFromStorage();
+    loadDashboard();
+    loadStudents();
+    loadVisits();
 </script>
 </body>
 </html>
